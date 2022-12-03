@@ -106,5 +106,5 @@ fn part2() {
         total += score;
     }
 
-    println!("Final score: {}", total);
+    println!("Final score: {} (correct={})", total, total == 13433);
 }
