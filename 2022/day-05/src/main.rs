@@ -8,15 +8,17 @@ fn main() {
     let mut stacks_part_1: Vec<Vec<char>> = vec![Vec::new(); 9];
     let mut stacks_part_2 = stacks_part_1.clone();
 
-    let mut do_movement = false;
+    let mut parsing = true;
 
     for (_, line) in lines.enumerate() {
         let line = line.unwrap();
 
+        // Indicates the stack index - ignore
         if line.starts_with(" 1") {
             continue;
         }
 
+        // Empty line indicates start of movement
         if line == "" {
             println!("Initial state:");
             for i in 0..stacks_part_1.len() {
@@ -25,12 +27,12 @@ fn main() {
             println!("");
 
             stacks_part_2 = stacks_part_1.clone();
-            do_movement = true;
+            parsing = false;
 
             continue;
         }
 
-        if do_movement == false {
+        if parsing {
             let chars: Vec<char> = line.chars().collect();
 
             for i in 0..9 {
