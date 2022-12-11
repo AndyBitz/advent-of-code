@@ -44,7 +44,7 @@ impl Monkey {
         let mut push_result = vec![Vec::new(); total];
 
         for _ in 0..self.items.len() {
-            self.items_held += 1;
+            self.items_held += 1; // Indicates that the Monkey held an item
             
             let item = self.items.remove(0);
             let item = self.operation(item, lcm); // Increase worry level
@@ -91,36 +91,20 @@ fn main() {
 
         // Get Starting Items
         let line = lines.next().unwrap().unwrap();
-
-        let mut items: Vec<u64> = Vec::new();
-
-        for number in line[18..].split(", ") {
-            items.push(number.parse::<u64>().unwrap());
-        }
+        let items = line[18..].split(", ").map(|n| n.parse::<u64>().unwrap()).collect();
 
         // Get Operation
         let line = lines.next().unwrap().unwrap();
 
-        let operator = &line[23..=23];
-        let term = &line[25..];
-
-        let operation_rhs = match term {
-            "old" => {
-                RHS::Old
-            },
-            _ => {
-                RHS::Value(term.parse::<u64>().unwrap())
-            },
+        let operation = match &line[23..=23] {
+            "*" => Operation::Multiply,
+            "+" => Operation::Add,
+            op => panic!("Unexpected operator: {}", op),
         };
 
-        let operation = match operator {
-            "*" => {
-                Operation::Multiply
-            },
-            "+" => {
-                Operation::Add
-            },
-            _ => panic!("Unexpected operator: {}", operator),
+        let operation_rhs = match &line[25..] {
+            "old" => RHS::Old,
+            rhs => RHS::Value(rhs.parse::<u64>().unwrap()),
         };
 
         // Get Test
@@ -167,6 +151,8 @@ fn main() {
         let monkey_len = monkeys.len();
 
         for index in 0..monkey_len {
+            // Uses the result of `inspect` instead of pushing directly
+            // because Rust makes it hard to borrow mutability.
             for (index, items) in monkeys[index].inspect(monkey_len, last_lcm).iter().enumerate() {
                 let monkey = &mut monkeys[index];
                 for item in items {
