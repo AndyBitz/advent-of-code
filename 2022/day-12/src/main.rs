@@ -2,15 +2,6 @@ use std::collections::{HashSet, HashMap};
 use std::fs::File;
 use std::io::{self, BufRead};
 
-// - height map
-// - local area from above
-// - a is the lowest, z the highest
-// - S is current position, which has a value of a
-// - E is best signal, it has a value of z
-// - can elevate only by one
-// - elevation for target can much lower than current
-// - can only move one square up, left, down, right
-
 struct Node {
     text: char,
     value: usize,
@@ -26,7 +17,7 @@ fn main() {
     let mut grid = Vec::new();
 
     let mut start = (0, 0);
-    // let mut target = (0, 0); // Only relevant for Part 1
+    // let mut target = (0, 0); // Part 1
 
     for (row, line) in lines.enumerate() {
         let mut squares = Vec::new();
@@ -34,12 +25,12 @@ fn main() {
         for (col, char) in line.unwrap().chars().into_iter().enumerate() {
             let value = match char {
                 'S' => {
-                    // start = (row, col);
+                    // start = (row, col); // Part 1
                     'a'
                 },
                 'E' => {
-                    // target = (row, col);
-                    start = (row, col);
+                    // target = (row, col); // Part 1
+                    start = (row, col); // Part 2
                     'z'
                 },
                 c => c,
@@ -58,11 +49,13 @@ fn main() {
     }
 
     println!("Starting at {:?}", start);
-    // println!("Destination at {:?}", target);
 
     print_grid(&grid);
 
     // Queue to keep track of what has to be processed.
+    // First part is the distance, which is used as priority.
+    // The lowest value should be processed next to find the shortest path.
+    // Second part are the coordinates of the node.
     let mut queue: Vec<(i32, (usize, usize))> = Vec::new();
     queue.push((0, start));
 
@@ -89,12 +82,18 @@ fn main() {
                 continue;
             }
 
+            // Use `i32::MAX` aka Infinity if we didn't process the node yet.
+            // Otherwise we'll use the distance that was calculated before.
             let neighbour_distance = match distances.get(&neighbour) {
                 Some(distance) => *distance,
                 None => i32::MAX,
             };
 
+            // Caclulate the new distance from the parent to the current node.
             let temp_distance = parent_distance + 1;
+
+            // If the new distance is lower than the previous one,
+            // we update the node and add the node to the queue to keep walking
             if neighbour_distance > temp_distance {
                 distances.insert(neighbour, temp_distance);
                 queue.push((temp_distance, neighbour));
