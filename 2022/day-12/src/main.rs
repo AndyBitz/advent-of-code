@@ -26,7 +26,7 @@ fn main() {
     let mut grid = Vec::new();
 
     let mut start = (0, 0);
-    let mut target = (0, 0);
+    // let mut target = (0, 0); // Only relevant for Part 1
 
     for (row, line) in lines.enumerate() {
         let mut squares = Vec::new();
@@ -34,11 +34,12 @@ fn main() {
         for (col, char) in line.unwrap().chars().into_iter().enumerate() {
             let value = match char {
                 'S' => {
-                    start = (row, col);
+                    // start = (row, col);
                     'a'
                 },
                 'E' => {
-                    target = (row, col);
+                    // target = (row, col);
+                    start = (row, col);
                     'z'
                 },
                 c => c,
@@ -57,27 +58,9 @@ fn main() {
     }
 
     println!("Starting at {:?}", start);
-    println!("Destination at {:?}", target);
+    // println!("Destination at {:?}", target);
 
     print_grid(&grid);
-
-
-
-    // function dijkstra(G, S)
-    // for each vertex V in G
-    //     distance[V] <- infinite
-    //     previous[V] <- NULL
-    //     If V != S, add V to Priority Queue Q
-    // distance[S] <- 0
-	
-    // while Q IS NOT EMPTY
-    //     U <- Extract MIN from Q
-    //     for each unvisited neighbour V of U
-    //         tempDistance <- distance[U] + edge_weight(U, V)
-    //         if tempDistance < distance[V]
-    //             distance[V] <- tempDistance
-    //             previous[V] <- U
-    // return distance[], previous[]
 
     // Queue to keep track of what has to be processed.
     let mut queue: Vec<(i32, (usize, usize))> = Vec::new();
@@ -121,8 +104,29 @@ fn main() {
 
     println!("Visited {}", visited.len());
 
-    // 526 is too high
-    println!("Distance for target {}", distances.get(&target).unwrap());
+    // Part 1: 472 
+    // println!("Distance for target {}", distances.get(&target).unwrap());
+
+    // Find the `a` node with the lowest distances
+    let mut lowest = i32::MAX;
+    for row in grid {
+        for col in row {
+            if col.text == 'a' {
+                let distance = distances.get(&col.coords);
+                if distance == None {
+                    continue;
+                }
+
+                let distance = distance.unwrap();
+                if lowest > *distance {
+                    lowest = *distance;
+                }
+            }
+        }
+    }
+
+    // Part 2: 465
+    println!("Shortest path from any a {}", lowest);
 }
 
 fn print_grid(grid: &Vec<Vec<Node>>) {
@@ -178,5 +182,9 @@ fn get_surroundings(coords: &(usize, usize), grid: &Vec<Vec<Node>>) -> Vec<(usiz
 fn can_access(current: &(usize, usize), target: &(usize, usize), grid: &Vec<Vec<Node>>) -> bool {
     let current = grid[current.0][current.1].value;
     let target = grid[target.0][target.1].value;
-    return  current > target || current == target || target == current + 1;
+    // Part 1
+    // return  current > target || current == target || target == current + 1;
+
+    // Part 2
+    return target > current || current == target || target + 1 == current;
 }
