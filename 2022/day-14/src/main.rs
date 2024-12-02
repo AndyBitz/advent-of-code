@@ -61,7 +61,7 @@ fn main() {
     let mut sand_still = 0;
     let mut sand_pos = (0, 500);
 
-    let animate = false;
+    let animate = true;
 
     loop {
         if animate {
@@ -125,16 +125,20 @@ fn main() {
 }
 
 fn print_grid(grid: &Vec<Vec<char>>, sand: &(usize, usize), reset: bool) {
+    let mut output = Vec::new();
+    
     for row in 0..40 {
         for col in 400..600 {
             if row == sand.0 && col == sand.1 {
-                print!("o");
+                output.push("o".to_string());
             } else {
-                print!("{}", grid[row][col]);
+                output.push(format!("{}", grid[row][col]).to_string());
             }
         }
-        print!("\n");
+        output.push("\n".to_string());
     }
+
+    print!("{}", output.join(""));
 
     if reset {
         print!("\x1b[40A");
